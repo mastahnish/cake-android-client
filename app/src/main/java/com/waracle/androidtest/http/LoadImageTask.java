@@ -20,7 +20,18 @@ public class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
 
     private static final String TAG = LoadImageTask.class.getSimpleName();
 
-    private final WeakReference<ImageView> viewWeakReference;
+    public interface AsyncResponseListener {
+        void processFinish(Bitmap output);
+    }
+
+
+    private AsyncResponseListener listener;
+    private WeakReference<ImageView> viewWeakReference = null;
+
+    public LoadImageTask(AsyncResponseListener listener) {
+        this.listener = listener;
+        this.viewWeakReference = null;
+    }
 
     public LoadImageTask(ImageView imageView) {
         this.viewWeakReference = new WeakReference<>(imageView);
@@ -31,6 +42,7 @@ public class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
     protected Bitmap doInBackground(String... strings) {
         HttpURLConnection connection = null;
         InputStream inputStream = null;
+        Bitmap resultBitmap = null;
 
         try {
             connection = (HttpURLConnection) new URL(strings[0]).openConnection();
@@ -38,11 +50,12 @@ public class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
             try {
                 // Read data from workstation
                 inputStream = connection.getInputStream();
-                return BitmapFactory.decodeStream(inputStream);
+                resultBitmap = BitmapFactory.decodeStream(inputStream);
+                return resultBitmap;
             } catch (IOException e) {
                 // Read the error from the workstation
                 inputStream = connection.getErrorStream();
-                return null;
+                return resultBitmap;
             }
 
 
@@ -54,20 +67,23 @@ public class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
             StreamUtils.close(inputStream);
 
             // Disconnect the connection
-            if(connection!=null){
+            if (connection != null) {
                 connection.disconnect();
             }
         }
-        return null;
+        return resultBitmap;
     }
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
+        listener.processFinish(bitmap);
 
-        ImageView imageView = viewWeakReference.get();
+        if (viewWeakReference != null) {
+            ImageView imageView = viewWeakReference.get();
 
-        if(imageView != null) {
-            imageView.setImageBitmap(bitmap);
+            if (imageView != null) {
+                imageView.setImageBitmap(bitmap);
+            }
         }
     }
 }
