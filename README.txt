@@ -2,6 +2,9 @@
 Post-solution notes from candidate Jacek (mastahnish):
 
 All tasks are solved. However please note that there is one know issue: Victoria Sponge cake photo cannot load (decode) for some reason. I spent some time to investigate it but with no success, not sure if I should spend more time on this. If yes, please let me know.
+
+Of course this task is a perfect match to use 3rd party libs like Retorfit, Glide, Dagger2, RxJava, but I didn't use them in the code as per requirement. 
+However I decided to used RecyclerView from android support design library as I don't tread it as a 3rd party lib since I don't consider com.android.support.* as a 3rd party libs.
 ***
 
 
