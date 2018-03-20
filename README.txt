@@ -26,6 +26,6 @@ The test should take around 2 hours, certainly no longer than 3 hours. Good luck
 
 
 
-*EDIT*
+*EDIT from candidate Jacek (mastahnish)*
 All tasks are solved. However please note that there is one know issue: Victoria Sponge cake photo cannot load (decode) for some reason. I spent some time to investigate it but with no success, not sure if I should spend more time on this. If yes, please let me know.
 
