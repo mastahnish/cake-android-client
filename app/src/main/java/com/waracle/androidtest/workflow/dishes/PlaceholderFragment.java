@@ -6,7 +6,9 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -34,6 +36,11 @@ public class PlaceholderFragment extends Fragment implements IPlaceholderFragmen
     public PlaceholderFragment() {
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +69,19 @@ public class PlaceholderFragment extends Fragment implements IPlaceholderFragmen
     @Override
     public void updateView(List<Dish> output) {
         mAdapter.setItems(output);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_refresh) {
+            presenter.loadItems();;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 

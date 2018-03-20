@@ -4,13 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import static com.waracle.androidtest.http.HttpUtils.CONNECTION_TIMEOUT;
 
 /**
  * Created by Jacek on 2018-03-19.
@@ -26,42 +26,38 @@ public class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
 
 
     private AsyncResponseListener listener;
-    private WeakReference<ImageView> viewWeakReference = null;
 
     public LoadImageTask(AsyncResponseListener listener) {
         this.listener = listener;
-        this.viewWeakReference = null;
-    }
-
-    public LoadImageTask(ImageView imageView) {
-        this.viewWeakReference = new WeakReference<>(imageView);
     }
 
 
     @Override
-    protected Bitmap doInBackground(String... strings) {
+    protected Bitmap doInBackground(String... params) {
         HttpURLConnection connection = null;
         InputStream inputStream = null;
         Bitmap resultBitmap = null;
 
         try {
-            connection = (HttpURLConnection) new URL(strings[0]).openConnection();
+            URL url = new URL(params[0]);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(CONNECTION_TIMEOUT);
+            connection.setReadTimeout(CONNECTION_TIMEOUT);
+            connection.setInstanceFollowRedirects(true);
             connection.connect();
             try {
-                // Read data from workstation
                 inputStream = connection.getInputStream();
                 resultBitmap = BitmapFactory.decodeStream(inputStream);
+
                 return resultBitmap;
             } catch (IOException e) {
-                // Read the error from the workstation
-                inputStream = connection.getErrorStream();
+                Log.d(TAG, "IOException error: " + e.getMessage());
                 return resultBitmap;
             }
 
-
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "IOException error: " + e.getMessage());
         } finally {
             // Close the input stream if it exists.
             StreamUtils.close(inputStream);
@@ -77,13 +73,5 @@ public class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         listener.processFinish(bitmap);
-
-        if (viewWeakReference != null) {
-            ImageView imageView = viewWeakReference.get();
-
-            if (imageView != null) {
-                imageView.setImageBitmap(bitmap);
-            }
-        }
     }
 }
